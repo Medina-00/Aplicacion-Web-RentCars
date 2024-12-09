@@ -1,0 +1,135 @@
+﻿@using Core.Application.Dtos.Account.Response
+@using Microsoft.AspNetCore.Http
+@using Core.Application.Helpers;
+@inject IHttpContextAccessor httpContextAccessor
+@{
+    var User = httpContextAccessor.HttpContext.Session.Get<AuthenticationResponse>("user");
+    var Usuario = User != null ? User.Roles.Any(r => r == "Usuario") : false;
+    var Admin = User != null ? User.Roles.Any(r => r == "Admin") : false;
+}
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        a{
+            list-style:none;
+            text-decoration:none;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <main>
+        
+        <section class="welcome">
+            <div class="container w">
+                @if (User != null)
+                {
+
+                    <h1 style="font-size:60px">Bienvenido @User.Nombre.ToUpper() @User.Apellido.ToUpper() a RentDrive</h1>
+                            <p>Descubre la libertad de viajar con nuestra amplia selección de vehículos y servicios de alquiler personalizados.</p>
+                }
+                else
+                {
+                    <h1>Bienvenido  a RentDrive</h1>
+                            <p>Descubre la libertad de viajar con nuestra amplia selección de vehículos y servicios de alquiler personalizados.</p>
+                }
+
+            </div>
+        </section>
+
+        <section id="servicios" class="services">
+            <div class="container">
+                <h2>Nuestros Servicios</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <img src="~/css/Imagenes/image.png" alt="Icono de reserva en línea">
+                        <h3>Reserva en Línea</h3>
+                        <p>Reserva tu vehículo de forma rápida y sencilla desde cualquier dispositivo.</p>
+                    </div>
+                    <div class="service-card">
+                        <img src="~/css/Imagenes/image copy.png" alt="Icono de seguro">
+                        <h3>Seguro Completo</h3>
+                        <p>Viaja tranquilo con nuestras opciones de seguro integral para tu vehículo.</p>
+                    </div>
+                    <div class="service-card">
+                        <img src="~/css/Imagenes/image copy 2.png" alt="Icono de asistencia en carretera">
+                        <h3>Asistencia 24/7</h3>
+                        <p>Asistencia en carretera disponible las 24 horas, los 7 días de la semana.</p>
+                    </div>
+                    <div class="service-card">
+                        <img src="~/css/Imagenes/image copy 3.png" alt="Icono de kilometraje ilimitado">
+                        <h3>Kilometraje Ilimitado</h3>
+                        <p>Disfruta de la libertad de recorrer largas distancias sin preocupaciones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="categorias" class="car-categories">
+            <div class="container">
+                <h2>Categorías de Vehículos</h2>
+                <div class="categories-grid">
+                    <a asp-controller="Vehiculo" asp-action="Index" asp-route-categoria="Compacto">
+
+                        <div class="category-card">
+                            <img src="https://cdn.autobild.es/sites/navi.axelspringer.es/public/media/image/2023/12/toyota-corolla-3245502.jpg?tf=3840x" alt="Coche compacto">
+                            <h3>Compacto</h3>
+                        </div>
+
+                    </a>
+                    <a asp-controller="Vehiculo" asp-action="Index" asp-route-categoria="Sedán">
+
+
+                        <div class="category-card">
+                            <img src="https://media.licdn.com/dms/image/v2/C4E12AQERkfK9gGdmpA/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1602719647535?e=2147483647&v=beta&t=Z67WmMHADbJdy5llPPiVgXYDm7IRa8gNpf_HWq_oNuk" alt="Coche sedán">
+                            <h3>Sedán</h3>
+                        </div>
+                    </a>
+                    <a asp-controller="Vehiculo" asp-action="Index" asp-route-categoria="SUV">
+                        <div class="category-card">
+                            <img src="https://s2-autoesporte.glbimg.com/2S42oNIpxYyW7SFwnnqvTlciOJ4=/0x0:620x400/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_cf9d035bf26b4646b105bd958f32089d/internal_photos/bs/2020/j/j/i64ud7Q9WhhQDH586aWw/2016-04-29-jaguar-f-pace-940x6284.jpg" alt="SUV">
+                            <h3>SUV</h3>
+                        </div>
+
+                    </a>
+                    <a asp-controller="Vehiculo" asp-action="Index" asp-route-categoria="Lujo">
+
+                        <div class="category-card">
+                            <img src="https://cdn.topgear.es/sites/navi.axelspringer.es/public/media/image/2018/06/bugatti-chiron-nurburgring_0.jpg?tf=3840x" alt="Coche de lujo">
+                            <h3>Lujo</h3>
+                        </div>
+                    </a>
+                    <a asp-controller="Vehiculo" asp-action="Index" asp-route-categoria="Furgoneta">
+
+                        <div class="category-card">
+                            <img src="https://d38b8me95wjkbc.cloudfront.net/uploads/rv_image/image/221132/resized_DSC07563.JPG" alt="Furgoneta">
+                            <h3>Furgoneta</h3>
+                        </div>
+                    </a>
+                    <a asp-controller="Vehiculo" asp-action="Index" asp-route-categoria="Eléctrico">
+                        <div class="category-card">
+                            <img src="https://cdn.motor1.com/images/mgl/eoOk4M/s3/prueba-tesla-model-3-traccion-trasera.jpg" alt="Coche eléctrico">
+                            <h3>Eléctrico</h3>
+                        </div>
+
+                    </a>
+                    
+                    
+                    
+                    
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

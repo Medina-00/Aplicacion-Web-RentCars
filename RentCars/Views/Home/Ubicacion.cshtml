@@ -1,0 +1,135 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    ViewData["Title"] = "Ubicacion";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+
+    <!-- Incluir el CSS de Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Incluir el CSS de Leaflet Routing Machine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+    <!-- Estilos personalizados -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: black;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            color: white;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #mapa {
+            max-width: 1500px;
+            margin: 40px auto;
+            padding: 10px;
+            background-color: black;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilo para el popup */
+        .leaflet-popup-content {
+            font-size: 1rem;
+            font-weight: bold;
+            color: black;
+        }
+
+            .leaflet-popup-content a {
+                color: blue;
+                text-decoration: none;
+            }
+
+                .leaflet-popup-content a:hover {
+                    text-decoration: underline;
+                }
+    </style>
+</head>
+<body>
+
+    <section id="mapa">
+        <h1>Ubicación de Nuestra RentCars 📍</h1>
+        <div id="map"></div>
+    </section>
+
+    <!-- Incluir el JS de Leaflet -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Incluir el JS de Leaflet Routing Machine -->
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+        // Crear el mapa centrado en las coordenadas de la tienda
+        var map = L.map('map').setView([18.50571, -69.8568079], 13); // Coordenadas de la tienda
+
+        // Cargar los datos de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Añadir un marcador en la ubicación de la tienda
+        var marker = L.marker([18.4485676, -69.6830949]).addTo(map);
+        marker.bindPopup("<b>Nuestra Ubicacion</b><br> 📍").openPopup();
+
+        // Agregar la funcionalidad de direcciones con Leaflet Routing Machine
+        var control = L.Routing.control({
+            waypoints: [
+                // Usamos un marcador vacío para inicializar el control
+                L.latLng(18.50571, -69.8568079)  // Ubicación de la tienda
+            ],
+            createMarker: function () { return null; }, // No crear marcador en el trayecto
+            routeWhileDragging: true // Mostrar el trayecto mientras se arrastra
+        }).addTo(map);
+
+        // Función para obtener la ubicación del usuario y calcular las direcciones
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var userLat = position.coords.latitude;
+                    var userLon = position.coords.longitude;
+
+                    // Crear la ubicación del usuario
+                    var userLocation = L.latLng(userLat, userLon);
+
+                    // Actualizar el trayecto: el primer punto será la ubicación del usuario, y el segundo será la tienda
+                    control.setWaypoints([userLocation, L.latLng(18.4485676, -69.6830949)]);
+                }, function () {
+                    alert("No se pudo obtener la ubicación del usuario.");
+                });
+            } else {
+                alert("Geolocalización no es compatible con este navegador.");
+            }
+        }
+
+        // Llamar a la función para obtener la ubicación del usuario y mostrar el trayecto
+        getUserLocation();
+    </script>
+
+</body>
+</html>

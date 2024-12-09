@@ -1,0 +1,268 @@
+﻿@model IEnumerable<Core.Application.ViewModel.Vehiculo.VehiculoViewModel>
+
+@using Core.Application.Dtos.Account.Response
+@using Microsoft.AspNetCore.Http
+@using Core.Application.Helpers;
+@inject IHttpContextAccessor httpContextAccessor
+@{
+    var User = httpContextAccessor.HttpContext.Session.Get<AuthenticationResponse>("user");
+    var Admin = User != null ? User.Roles.Any(r => r == "Admin") : false;
+}
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Vehículos</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 2rem;
+            color: #333;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+            margin-top:50px;
+            border: 1px solid #1e2a3a;
+            border-radius:20px;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+            width: 200px;
+        }
+
+        .filters select:focus,
+        .filters input:focus {
+            border-color: #1e2a3a;
+            box-shadow: 0 0 10px rgba(30, 42, 58, 0.2);
+            outline: none;
+        }
+
+        .filters button {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            background-color: #1e2a3a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: auto;
+               
+        }
+
+            
+
+        .filters button:hover {
+            background-color: #1b2631;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .car-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .car-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 15px #1e2a3a;
+        }
+
+        .car-image {
+            width: 100%;
+            height: auto;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 255, 0.1);
+        }
+
+        .car-category {
+            color: #1e2a3a;
+            font-weight: bold;
+            font-size: 1.25rem;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .car-model {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .car-specs {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #444;
+            font-size: 0.9rem;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .spec-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        .view-details {
+            background-color: #1e2a3a;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .view-details:hover {
+            background-color: #1b2631;
+        }
+
+        
+    </style>
+</head>
+
+<body>
+
+   
+   
+        <!-- Filtros -->
+        <div class="filters">
+            <form asp-controller="Vehiculo" asp-action="Index" method="post">
+                <select name="categoria" id="categoria">
+                    <option value="">Categoría</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Sedán">Sedán</option>
+                    <option value="Compacto">Compacto</option>
+                    <option value="Eléctrico">Eléctrico</option>
+                    <option value="Furgoneta">Furgoneta</option>
+                    <option value="Lujo">Lujo</option>
+                    <!-- Agregar más categorías según sea necesario -->
+                </select>
+
+                <select name="combustible" id="combustible">
+                    <option value="">Tipo de Combustible</option>
+                    <option value="Híbrido">Híbrido</option>
+                    <option value="Eléctrico">Eléctrico</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Gasolina">Gasolina</option>
+                    <!-- Más opciones si es necesario -->
+                </select>
+
+                <select name="transmision" id="transmision">
+                    <option value="">Transmisión</option>
+                    <option value="Automatico">Automático</option>
+                    <option value="Mecanico">Mecánico</option>
+                </select>
+
+                <input type="number" name="precio" id="precio" placeholder="Precio máximo por día" min="0">
+                <input type="number" name="numPersonas" id="num-personas" placeholder="Numero de persona" min="0">
+
+
+            <button type="submit" id="btn-filtrar">Filtrar <i class='bx bx-search'></i></button>
+            </form>
+        </div>
+
+    
+    
+
+    <!-- Grid de Vehículos -->
+    <div class="grid-container">
+        <!-- Iterar a través de los vehículos -->
+        @foreach (var item in Model)
+        {
+            <div class="car-card">
+                <img src="@item.ImagenVehiculo" alt="Imagen Vehículo" class="car-image">
+                <p class="car-model">Detalles: @item.Marca @item.Modelo @item.Año</p>
+                <a href="#" class="car-category">@item.Categoria</a>
+                <p class="car-model">Tipo de combustible: @item.Combustible</p>
+                
+                <div class="car-specs">
+                    @if (item.Transmision == "Automatico")
+                    {
+                        <div class="spec-item">
+                            <span class="material-icons spec-icon">⚙️</span>
+                            Automático
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="spec-item">
+                            <span class="material-icons spec-icon">🔧</span>
+                            Mecánico
+                        </div>
+                    }
+
+                    <div class="spec-item">
+                        <span class="material-icons spec-icon">👥</span>
+                        @item.NumeroPersonas
+                    </div>
+
+                    <div class="spec-item">
+                        <span class="material-icons spec-icon">💵</span>
+                        @item.PrecioPorDia
+                    </div>
+                </div>
+
+                <a class="view-details" asp-controller="Vehiculo" asp-action="Details" asp-route-id="@item.VehiculoId">Ver detalles <i class='bx bx-info-circle'></i></a>
+            </div>
+        }
+    </div>
+
+</body>
+
+</html>

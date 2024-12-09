@@ -1,0 +1,110 @@
+﻿@using Core.Application.Dtos.Account.Response
+@using Microsoft.AspNetCore.Http
+@using Core.Application.Helpers;
+@inject IHttpContextAccessor httpContextAccessor
+@{
+    var User = httpContextAccessor.HttpContext.Session.Get<AuthenticationResponse>("user");
+    var Usuario = User != null ? User.Roles.Any(r => r == "Usuario") : false;
+    var Admin = User != null ? User.Roles.Any(r => r == "Admin") : false;
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RentDrive</title>
+    @* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/bootstrap.min (1).css" asp-append-version="true" /> *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+</head>
+<body>
+   <header>
+        <nav>
+                    <!-- Logo -->
+                    <div class="logo">
+                RentDrive <i class='bx bxs-car'></i>
+                    </div>
+            @if (User != null)
+            {
+@* 
+                if (Usuario && Admin)
+                {
+
+
+                    <!-- Enlaces de navegación -->
+                    <ul class="nav-links">
+                        <li>
+                            <a asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Vehiculo" asp-action="Index">Vehiculos</a>
+                        </li>
+
+                        <li><a  asp-controller="User" asp-action="Index">Usuarios</a></li>
+                        <li><a asp-controller="User" asp-action="LogOut">LogOut</a></li>
+                    </ul>
+                } *@
+                if (Usuario)
+                {
+                    <!-- Enlaces de navegación -->
+                    <ul class="nav-links">
+                        <li>
+                            <a asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Vehiculo" asp-action="Index">Vehiculos</a>
+                        </li>
+                        <li>
+                            <a  asp-controller="Reserva" asp-action="Index">Mis reservas</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Home" asp-action="Ubicacion">Ubicacion</a>
+                        </li>
+                        <li><a asp-controller="User" asp-action="LogOut">LogOut</a></li>
+                    </ul>
+                }
+
+            }
+            else if (User == null)
+            {
+                <!-- Enlaces de navegación -->
+                <ul class="nav-links">
+                    <li>
+                        <a asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Vehiculo" asp-action="Index">Vehiculos</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="Ubicacion">Ubicacion</a>
+                    </li>
+                    <li> <a asp-controller="User" asp-action="Login">Login</a></li>
+                    <li><a asp-controller="User" asp-action="Create">Sing Up</a></li>
+                </ul>
+            }
+            <!-- Burger Menu -->
+            <div class="burger">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </nav>
+   </header>
+   
+       <div class="Render">
+
+            @RenderBody()
+       </div>
+        
+   
+
+  
+   @*  <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

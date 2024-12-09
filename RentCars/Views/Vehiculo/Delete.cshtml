@@ -1,0 +1,26 @@
+﻿@model Core.Application.ViewModel.Vehiculo.SaveVehiculoViewModel;
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/dashboard.cshtml";
+}
+
+<main class="container my-4">
+    <h1 class="text-center text-danger mb-4">Eliminar Vehículo</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h3 class="mb-3">¿Estás seguro de que deseas eliminar este vehículo?</h3>
+
+            <form asp-action="Delete" method="post">
+                <div class="mb-3">
+                    <input type="submit" value="Eliminar" class="btn btn-danger btn-lg" />
+                </div>
+
+                <div>
+                    <a asp-action="IndexDashboard" class="btn btn-outline-secondary btn-lg">Volver a la Lista</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>

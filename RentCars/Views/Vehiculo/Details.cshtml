@@ -1,0 +1,306 @@
+﻿@using Core.Application.Dtos.Account.Response
+@using Microsoft.AspNetCore.Http
+@using Core.Application.Helpers;
+@inject IHttpContextAccessor httpContextAccessor
+@{
+    var User = httpContextAccessor.HttpContext.Session.Get<AuthenticationResponse>("user");
+    var Admin = User != null ? User.Roles.Any(r => r == "Admin") : false;
+}
+@model Core.Application.ViewModel.Vehiculo.SaveVehiculoViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+@* <h1 class="text-center" style="color: #007bff;">Detalles del Vehículo</h1>
+
+<div class="container mt-4" style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h4 class="text-center">SaveVehiculoViewModel</h4>
+    <hr />
+
+    <div class="text-center mb-4">
+        <img src="@Html.DisplayFor(model => model.ImagenVehiculo)" alt="Imagen del Vehículo" class="img-fluid rounded" style="max-height: 300px; object-fit: cover;">
+    </div>
+
+    <dl class="row text-center">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.VehiculoId)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.VehiculoId)
+        </dd>
+
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Marca)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Marca)
+        </dd>
+
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Modelo)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Modelo)
+        </dd>
+
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Año)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Año)
+        </dd>
+
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.PrecioPorDia)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.PrecioPorDia)
+        </dd>
+
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Disponible)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Disponible)
+        </dd>
+    </dl>
+</div>
+
+<div class="text-center mt-4">
+    @if(Admin)
+    {
+        
+        @Html.ActionLink("Edit", "Edit", new { id = Model.VehiculoId }, new { @class = "btn btn-primary" }) 
+    }
+    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+</div> *@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Vehículo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+     
+    /* Estilo global */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        color: #333;
+        background-attachment: fixed; /* Fija el fondo para que no se mueva al hacer scroll */
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 80px auto;
+        padding: 30px 20px;
+        background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semi-transparente */
+        border-radius: 10px; /* Bordes redondeados para el contenedor principal */
+       
+    }
+
+    .car-detail {
+        display: flex;
+        justify-content: center; /* Centra todo el contenido en el contenedor */
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 50px;
+        flex-wrap: wrap; /* Permite que los elementos se ajusten en pantallas pequeñas */
+    }
+
+    .car-image {
+        display: flex;
+        justify-content: center; /* Centra la imagen horizontalmente */
+        align-items: center; /* Centra la imagen verticalmente */
+        flex: 1;
+    }
+
+    .car-image img {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .car-info {
+        flex: 1;
+        text-align: left;
+    }
+
+    .car-title {
+        font-size: 2.5rem;
+        color: #1c1c1c;
+        margin-bottom: 15px;
+    }
+
+    .car-category {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d96d9;
+        margin-bottom: 20px;
+    }
+
+    .price {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #e74c3c;
+        margin-bottom: 20px;
+    }
+
+    .car-description p {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+
+    .car-actions {
+        margin-top: 30px;
+    }
+
+    .btn-reserve {
+        display: inline-block;
+        background-color: #2d96d9;
+        color: #fff;
+        padding: 15px 25px;
+        font-size: 1.2rem;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-reserve:hover {
+        background-color: #227bb0;
+    }
+
+    /* Pestañas */
+    .car-tabs {
+        margin-top: 50px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+
+    .tabs {
+        display: flex;
+        border-bottom: 2px solid #ddd;
+        margin-bottom: 20px;
+    }
+
+    .tab-button {
+        flex: 1;
+        padding: 15px;
+        background-color: transparent;
+        border: none;
+        font-size: 1.2rem;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .tab-button:hover,
+    .tab-button.active {
+        color: #2d96d9;
+        border-bottom: 3px solid #2d96d9;
+    }
+
+    .tab-content {
+        display: none;
+        padding-top: 20px;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    ul {
+        list-style: none;
+        padding-left: 20px;
+    }
+
+    ul li {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+   
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="car-detail">
+            <div class="car-image">
+                <img src="@Model.ImagenVehiculo" alt="Car image" class="img-fluid">
+            </div>
+            <div class="car-info">
+                <h1 class="car-title"> @Model.Marca - @Model.Modelo - @Model.Año </h1>
+                <p class="car-category">Sedán</p>
+                <div class="price">
+                    <span>@Model.PrecioPorDia</span> / día
+                </div>
+                <div class="car-description">
+                    <p><strong>Transmisión:</strong> @Model.Transmision</p>
+                    <p><strong>Combustible:</strong> @Model.Combustible</p>
+                    <p><strong>Capacidad:</strong> @Model.NumeroPersonas</p>
+                </div>
+                <div class="car-actions">
+                    <a asp-controller="Reserva" asp-action="Create" asp-route-id="@Model.VehiculoId" class="btn-reserve">Reservar ahora <i class='bx bxs-store'></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="car-tabs">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="description">Descripción</button>
+                <button class="tab-button" data-tab="features">Características</button>
+                <button class="tab-button" data-tab="terms">Términos</button>
+            </div>
+            <div class="tab-content active" id="description">
+                <p>@Model.Descripcion</p>
+            </div>
+            <div class="tab-content" id="features">
+                <ul>
+                    <li>Sistema de infoentretenimiento con pantalla táctil de 8"</li>
+                    <li>Compatibilidad con Apple CarPlay y Android Auto</li>
+                    <li>Cámara de visión trasera</li>
+                    <li>Control de crucero adaptativo</li>
+                    <li>Sistema de frenado de emergencia automático</li>
+                </ul>
+            </div>
+            <div class="tab-content" id="terms">
+                <ul>
+                    <li>Edad mínima: 18 años</li>
+                    <li>Se requiere licencia de conducir válida</li>
+                    <li>Kilometraje ilimitado</li>
+                    <li>Seguro básico incluido</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cambio de contenido para las pestañas
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                button.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+﻿@using Core.Application.ViewModel.Vehiculo
+@model Core.Application.ViewModel.Reserva.SaveReservaViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    var precioTotal = ViewBag.PrecioTotal;
+}
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reserva Vehículo</title>
+    <script src="https://www.paypal.com/sdk/js?client-id=AagbCIQ7cBGAhnmIxDEco7jFeloSNWdd-PCI0gP9iPyW8Fm3YomiVSxOs662sthMIg_jDFTzCpmbbJai&buyer-country=US&currency=USD&components=buttons&enable-funding=paylater,card"
+            data-sdk-integration-source="developer-studio"></script>
+    <style>
+        :root {
+            --primary-color: #1e2a3a;
+            --secondary-color: #f0f0f0;
+            --text-color: #333;
+            --light-text: #666;
+            --border-color: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            margin-top: 50px;
+            padding: 20px;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .booking-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .booking-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .date-picker {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .price-details {
+            color: var(--light-text);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .book-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .book-button:hover {
+                background-color: #096b36;
+            }
+
+        /* Estilo para centrar el contenedor del botón de PayPal */
+        #paypal-button-container {
+            display: flex; /* Usa flexbox para alinear los elementos dentro del contenedor */
+            justify-content: center; /* Centra el contenido horizontalmente */
+            align-items: center; /* Centra el contenido verticalmente */
+            margin: 20px auto; /* Centra el contenedor en la página y agrega espacio alrededor */
+            width: 100%; /* El contenedor ocupa todo el ancho disponible */
+            max-width: 600px; /* Ancho máximo para el contenedor */
+            text-align: center; /* Asegura que el botón se alinee correctamente */
+        }
+
+
+
+    </style>
+</head>
+<body>
+    @foreach (VehiculoViewModel item in ViewBag.Vehiculos)
+    {
+        <div class="container">
+
+            <div class="right-column">
+                <div class="booking-card">
+                    <h2 class="booking-title">Reserva ahora</h2>
+                    <form id="booking-form" asp-action="Create">
+                        <input asp-for="UsuarioId" type="hidden" />
+                        <input asp-for="VehiculoId" type="hidden" />
+                        <input asp-for="PrecioTotal" type="hidden" />
+                        <h2 class="booking-title">Reserva tu @item.Marca @item.Modelo</h2>
+                        <p>Selecciona las fechas de recogida y devolución</p>
+                        <input type="date" asp-for="FechaInicio" class="date-picker" aria-label="Fecha de recogida" id="fechaInicio" onchange="setMinFechaFin()">
+                        <input type="date" asp-for="FechaFin" class="date-picker" aria-label="Fecha de devolución" id="fechaFin">
+                        <p class="price">@item.PrecioPorDia / día</p>
+
+                        <!-- Aquí el contenedor del botón de PayPal -->
+                        <div id="paypal-button-container">
+                            
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    
+    <script>
+        
+
+      
+
+        window.paypal.Buttons({
+            style: {
+                shape: "rect",       // Botón rectangular
+                layout: "vertical",  // Diseño vertical
+                color: "gold",       // Color dorado
+                label: "paypal",     // Etiqueta del botón
+            },
+
+            createOrder: function (data, actions) {
+                
+
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: 100  // Aquí deberías poner el precio dinámico
+                        }
+                    }]
+                });
+
+            },
+
+            onApprove: function (data, actions) {
+                document.getElementById("booking-form").submit();
+                actions.order.capture().then(function (details) {
+                     console.log("Pago aprobado:", details);
+                });
+
+            },
+
+            onCancel: function (data) {
+                alert("El pago ha sido cancelado.");
+                console.log(data);
+            }
+
+
+
+        }).render("#paypal-button-container");  // Renderiza el botón de PayPal en el contenedor
+    </script>
+</body>
+</html>
+
+
+@* @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        
+    </script>
+}
+ *@

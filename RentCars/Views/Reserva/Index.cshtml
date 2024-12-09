@@ -1,0 +1,151 @@
+﻿@using Core.Application.ViewModel.Vehiculo
+@model IEnumerable<Core.Application.ViewModel.Reserva.ReservaViewModel>
+
+@{
+    ViewData["Title"] = "Mis Reservas";
+}
+<style>
+    :root {
+        --primary-color: #1e2a3a;
+        --secondary-color: #f0f0f0;
+        --highlight-color: #096b36;
+        --text-color: #333;
+        --light-text: #666;
+        --border-color: #ddd;
+        --background-color: #f9f9f9;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .reservations-container {
+        max-width: 100%;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .reservations-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .reservations-table th, .reservations-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .reservations-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .reservations-table td {
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .reservations-table tr:hover {
+            background-color: #f2f2f2;
+        }
+
+    .status {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+        .status.completed {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .status.ongoing {
+            background-color: #ff9800;
+            color: white;
+        }
+
+    .action-buttons {
+        text-align: center;
+    }
+
+        .action-buttons a {
+            margin: 0 5px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            .action-buttons a:hover {
+                color: var(--highlight-color);
+                text-decoration: underline;
+            }
+
+</style>
+<div class="reservations-container">
+    <h1>Mis Reservas</h1>
+
+    <table class="reservations-table">
+        <thead>
+            <tr>
+                
+                <th>Vehículo</th>
+                <th>Fecha de Inicio</th>
+                <th>Fecha de Fin</th>
+                <th>Precio Total</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    @foreach (VehiculoViewModel vehiculo in ViewBag.Vehiculos)
+                    {
+                        if(vehiculo.VehiculoId == item.VehiculoId)
+                        {
+                            <td>@vehiculo.Marca @vehiculo.Modelo @vehiculo.Año</td>
+                        }
+                    }
+                    <td>@Html.DisplayFor(modelItem => item.FechaInicio)</td>
+                    <td>@Html.DisplayFor(modelItem => item.FechaFin)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PrecioTotal)</td>
+                    <td>
+                        @if (item.FechaFin < DateTime.Now)
+                        {
+                            <span class="status completed">Completada</span>
+                        }
+                        else
+                        {
+                            <span class="status ongoing">En curso</span>
+                        }
+                    </td>
+                   
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

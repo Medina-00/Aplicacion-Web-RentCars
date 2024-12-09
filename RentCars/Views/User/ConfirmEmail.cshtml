@@ -1,0 +1,93 @@
+﻿@model string
+@{
+    ViewData["Title"] = "ConfirmEmail";
+
+
+}
+
+<style>
+    /* Estilos generales para la página */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    /* Contenedor principal */
+    .confirmation-container {
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    /* Estilo de la tarjeta */
+    .confirmation-card {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    /* Estilo del cuerpo de la tarjeta */
+    .confirmation-card-body {
+        padding: 30px;
+    }
+
+    /* Estilo de la alerta */
+    .confirmation-alert {
+        background-color: #cce5ff;
+        border-left: 6px solid #007bff;
+        padding: 20px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .confirmation-alert h2 {
+            font-size: 20px;
+            margin: 0;
+            color: #0056b3;
+        }
+
+        .confirmation-alert a {
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+            .confirmation-alert a:hover {
+                background-color: #0056b3;
+            }
+
+        /* Botón de cerrar */
+        .confirmation-alert:after {
+            content: '×';
+            font-size: 30px;
+            font-weight: bold;
+            color: #0056b3;
+            cursor: pointer;
+        }
+
+</style>
+
+<div class="confirmation-container">
+    <div class="confirmation-card">
+        <div class="confirmation-card-body">
+            <div class="confirmation-alert">
+                <h2>@Model - <a class="btn-signin" href="@Url.Action("Login", "User")">Sign in</a></h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+
