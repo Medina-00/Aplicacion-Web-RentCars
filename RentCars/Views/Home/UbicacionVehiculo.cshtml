@@ -1,0 +1,57 @@
+﻿@{
+    // Los datos se pasan desde el controlador a la vista en una variable de modelo
+    var vehiculosEnMapa = Model;
+    ViewData["Title"] = "UbicacionVehiculo";
+    Layout = "~/Views/Shared/dashboard.cshtml";
+
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Vehículos Rentados</title>
+
+    <!-- Incluir el CSS de Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        /* Estilo para el mapa */
+        #map {
+            height: 500px; /* Altura del mapa */
+        }
+    </style>
+</head>
+<body>
+    <h1>Vehículos Rentados</h1>
+
+    <!-- Contenedor del mapa -->
+    <div id="map"></div>
+
+    <!-- Incluir el JS de Leaflet -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        // Inicializa el mapa en una ubicación predeterminada
+        // var map = L.map('map').setView([19.432608, -99.133209], 13);  // Centro de Ciudad de México (modifica según tu preferencia)
+        var map = L.map('map').setView([18.7357, -70.1627], 13);  // Coordenadas de República Dominicana
+
+
+        // Cargar una capa de mapa (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Los datos de las ubicaciones de los vehículos se pasan desde el backend
+        var vehiculosEnMapa = @Html.Raw(Json.Serialize(vehiculosEnMapa));
+        // Verificar los datos en la consola (opcional)
+        console.log(vehiculosEnMapa);
+        // Recorremos las ubicaciones y agregamos los marcadores
+        vehiculosEnMapa.forEach(function (vehiculo) {
+            // Crear un marcador para cada vehículo en el mapa
+            L.marker([vehiculo.latitud, vehiculo.longitud])
+                .addTo(map)
+            .bindPopup('<strong>' + vehiculo.carro + '</strong>' + '<br />' + 'Rentado por: ' + vehiculo.cliente);
+        });
+    </script>
+</body>
+</html>

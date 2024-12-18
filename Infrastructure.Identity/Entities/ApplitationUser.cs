@@ -8,6 +8,7 @@ namespace Infrastructure.Identity.Entities
         public string Nombre { get; set; }
         public string Apellido { get; set; }
 
+
         
     }
 }

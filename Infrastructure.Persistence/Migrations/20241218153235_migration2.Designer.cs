@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicactionContext))]
-    [Migration("20241109193546_migracionEntidades")]
-    partial class migracionEntidades
+    [Migration("20241218153235_migration2")]
+    partial class migration2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,22 +25,6 @@ namespace Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Domain.Entities.Categoria", b =>
-                {
-                    b.Property<int>("IdCategoria")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCategoria"));
-
-                    b.Property<string>("NameDescripcion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("IdCategoria");
-
-                    b.ToTable("Categoria", (string)null);
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Reserva", b =>
                 {
                     b.Property<int>("ReservaId")
@@ -49,11 +33,25 @@ namespace Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaId"));
 
+                    b.Property<string>("Cedula")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("FechaFin")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("FechaInicio")
                         .HasColumnType("datetime2");
+
+                    b.Property<double>("Latitud")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitud")
+                        .HasColumnType("float");
+
+                    b.Property<string>("NumeroLincencia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PrecioTotal")
                         .HasColumnType("decimal(18,2)");
@@ -83,17 +81,18 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int>("Año")
                         .HasColumnType("int");
 
+                    b.Property<string>("Categoria")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Combustible")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Disponible")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IdCategoria")
-                        .HasColumnType("int");
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImagenVehiculo")
                         .HasColumnType("nvarchar(max)");
@@ -115,8 +114,6 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("VehiculoId");
 
-                    b.HasIndex("IdCategoria");
-
                     b.ToTable("Vehiculo", (string)null);
                 });
 
@@ -129,22 +126,6 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Vehiculo");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Vehiculo", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.Categoria", "Categoria")
-                        .WithMany("Vehiculos")
-                        .HasForeignKey("IdCategoria")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Categoria");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Categoria", b =>
-                {
-                    b.Navigation("Vehiculos");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Vehiculo", b =>

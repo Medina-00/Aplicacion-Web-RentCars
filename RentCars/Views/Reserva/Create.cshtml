@@ -6,7 +6,6 @@
     var precioTotal = ViewBag.PrecioTotal;
 }
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,6 +14,19 @@
     <title>Reserva Vehículo</title>
     <script src="https://www.paypal.com/sdk/js?client-id=AagbCIQ7cBGAhnmIxDEco7jFeloSNWdd-PCI0gP9iPyW8Fm3YomiVSxOs662sthMIg_jDFTzCpmbbJai&buyer-country=US&currency=USD&components=buttons&enable-funding=paylater,card"
             data-sdk-integration-source="developer-studio"></script>
+
+    <!-- Incluir el CSS de Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- Incluir el CSS del complemento Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <!-- Incluir el JS de Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- Incluir el JS del complemento Leaflet Control Geocoder -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
     <style>
         :root {
             --primary-color: #1e2a3a;
@@ -65,6 +77,15 @@
             color: var(--primary-color);
         }
 
+        .form-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            display: block;
+            text-align: left;
+        }
+
         .date-picker {
             width: 100%;
             padding: 10px;
@@ -101,26 +122,26 @@
                 background-color: #096b36;
             }
 
-        /* Estilo para centrar el contenedor del botón de PayPal */
-        #paypal-button-container {
-            display: flex; /* Usa flexbox para alinear los elementos dentro del contenedor */
-            justify-content: center; /* Centra el contenido horizontalmente */
-            align-items: center; /* Centra el contenido verticalmente */
-            margin: 20px auto; /* Centra el contenedor en la página y agrega espacio alrededor */
-            width: 100%; /* El contenedor ocupa todo el ancho disponible */
-            max-width: 600px; /* Ancho máximo para el contenedor */
-            text-align: center; /* Asegura que el botón se alinee correctamente */
+        #map {
+            margin-bottom: 20px;
+            height: 400px;
         }
 
-
-
+        #paypal-button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     @foreach (VehiculoViewModel item in ViewBag.Vehiculos)
     {
         <div class="container">
-
             <div class="right-column">
                 <div class="booking-card">
                     <h2 class="booking-title">Reserva ahora</h2>
@@ -130,37 +151,151 @@
                         <input asp-for="PrecioTotal" type="hidden" />
                         <h2 class="booking-title">Reserva tu @item.Marca @item.Modelo</h2>
                         <p>Selecciona las fechas de recogida y devolución</p>
-                        <input type="date" asp-for="FechaInicio" class="date-picker" aria-label="Fecha de recogida" id="fechaInicio" onchange="setMinFechaFin()">
-                        <input type="date" asp-for="FechaFin" class="date-picker" aria-label="Fecha de devolución" id="fechaFin">
+
+                        <!-- Fecha de inicio -->
+                        <label for="fechaInicio" class="form-label">Fecha de Recogida</label>
+                        <input type="date" asp-for="FechaInicio" class="date-picker" aria-label="Fecha de recogida" id="fechaInicio" onchange="setMinFechaFin()" />
+
+                        <!-- Fecha de fin -->
+                        <label for="fechaFin" class="form-label">Fecha de Devolución</label>
+                        <input type="date" asp-for="FechaFin" class="date-picker" aria-label="Fecha de devolución" id="fechaFin" />
+
+                        <!-- Cédula del usuario -->
+                        <label for="Cedula" class="form-label">Cédula del Usuario (SIN GUIONES)</label>
+                        <input asp-for="Cedula" class="form-control date-picker" aria-label="Cédula del usuario" id="Cedula" maxlength="13" oninput="formatCedula()" />
+                        <span id="cedulaError" style="color: red; display:none;">Formato inválido. Ejemplo: 123-1234567-5</span>
+
+                        <!-- Número de licencia -->
+                        <label for="NumeroLicencia" class="form-label">Número de Licencia (SIN GUIONES)</label>
+                        <input asp-for="NumeroLincencia" class="form-control  date-picker" aria-label="Número de licencia del usuario" id="NumeroLicencia" maxlength="10" oninput="formatLicencia()" />
+                        <span id="licenciaError" style="color: red; display:none;">Formato inválido. Ejemplo: Prefijo12345678</span>
+
+                        <!-- Latitud -->
+                        <label for="Latitud" class="form-label">Latitud</label>
+                        <input asp-for="Latitud" id="Latitud" class="date-picker" aria-label="Latitud" readonly />
+
+                        <!-- Longitud -->
+                        <label for="Longitud" class="form-label">Longitud</label>
+                        <input asp-for="Longitud" id="Longitud" class="date-picker" aria-label="Longitud" readonly />
+
+                        <!-- Mapa -->
+                        <div id="map" style="height: 400px;"></div>
+
+                        <!-- Precio -->
                         <p class="price">@item.PrecioPorDia / día</p>
 
-                        <!-- Aquí el contenedor del botón de PayPal -->
-                        <div id="paypal-button-container">
-                            
-                        </div>
-
+                        <div id="paypal-button-container"></div>
                     </form>
                 </div>
             </div>
         </div>
     }
-    
-    <script>
-        
 
-      
+    <script>
+        // Función para formatear y validar el número de licencia
+        function formatLicencia() {
+            var input = document.getElementById("NumeroLicencia");
+            var value = input.value;
+
+            // Eliminar cualquier carácter no alfanumérico
+            value = value.replace(/[^A-Za-z0-9]/g, '');
+
+            // Limitar la longitud a 10 caracteres (incluyendo el prefijo)
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+
+            // Asegurarse de que el prefijo está correcto y los siguientes 8 caracteres sean números
+            if (value.length > 2 && !/^[A-Za-z]{2}/.test(value)) {
+                value = 'LD' + value.substring(2); // Si el prefijo no es válido, lo corregimos
+            }
+
+            // Establecer el valor en el campo de entrada
+            input.value = value;
+
+            // Validar que el valor tenga el formato correcto (prefijo + 8 dígitos)
+            var isValid = /^[A-Za-z]{2}\d{8}$/.test(value);
+
+            // Mostrar u ocultar el mensaje de error
+            if (isValid) {
+                document.getElementById("licenciaError").style.display = "none"; // Ocultar el error si es válido
+            } else {
+                document.getElementById("licenciaError").style.display = "inline"; // Mostrar el error si no es válido
+            }
+        }
+        function formatCedula() {
+            var input = document.getElementById("Cedula");
+            var value = input.value.replace(/\D/g, ''); // Elimina todo lo que no sea un número (solo dígitos)
+
+            if (value.length <= 3) {
+                input.value = value; // Solo los primeros 3 dígitos
+            } else if (value.length <= 10) {
+                input.value = value.slice(0, 3) + '-' + value.slice(3); // Formato: 123-123456
+            } else {
+                input.value = value.slice(0, 3) + '-' + value.slice(3, 10) + '-' + value.slice(10, 11); // Formato: 123-1234567-5
+            }
+
+            // Verificar si el valor tiene el formato correcto
+            if (value.length === 11) {
+                document.getElementById("cedulaError").style.display = "none"; // Ocultar error si es correcto
+            } else {
+                document.getElementById("cedulaError").style.display = "inline"; // Mostrar error si no tiene el formato correcto
+            }
+        }
+        var map = L.map('map').setView([18.7357, -70.1627], 13);  // Coordenadas de República Dominicana
+
+        // Cargar los datos de OpenStreetMap (con las etiquetas de calles visibles)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Agregar un marcador en la ubicación inicial
+        var marker = L.marker([18.7357, -70.1627]).addTo(map);
+        marker.bindPopup("Selecciona una ubicación").openPopup();
+
+        function obtenerDireccion(lat, lon) {
+            var url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    var direccion = data.display_name;  // Dirección completa
+                    marker.bindPopup(`<b>Ubicación Seleccionada</b><br>${direccion}`).openPopup();
+                })
+                .catch(error => {
+                    console.error('Error al obtener la dirección:', error);
+                });
+        }
+
+
+
+        // Evento de clic en el mapa
+        map.on('click', function (event) {
+            var lat = event.latlng.lat;
+            var lon = event.latlng.lng;
+
+            // Mover el marcador
+            marker.setLatLng(event.latlng);
+
+            // Actualizar los campos en el formulario
+            document.getElementById('Latitud').value = lat;
+            document.getElementById('Longitud').value = lon;
+
+            obtenerDireccion(lat, lon);
+        });
+
+        // Agregar el buscador de direcciones
+        L.Control.geocoder().addTo(map);  // Agrega el control de geocodificación (buscador de direcciones)
 
         window.paypal.Buttons({
             style: {
-                shape: "rect",       // Botón rectangular
-                layout: "vertical",  // Diseño vertical
-                color: "gold",       // Color dorado
-                label: "paypal",     // Etiqueta del botón
+                shape: "rect",
+                layout: "vertical",
+                color: "gold",
+                label: "paypal",
             },
 
             createOrder: function (data, actions) {
-                
-
                 return actions.order.create({
                     purchase_units: [{
                         amount: {
@@ -168,37 +303,20 @@
                         }
                     }]
                 });
-
             },
 
             onApprove: function (data, actions) {
                 document.getElementById("booking-form").submit();
                 actions.order.capture().then(function (details) {
-                     console.log("Pago aprobado:", details);
+                    console.log("Pago aprobado:", details);
                 });
-
             },
 
             onCancel: function (data) {
                 alert("El pago ha sido cancelado.");
                 console.log(data);
             }
-
-
-
-        }).render("#paypal-button-container");  // Renderiza el botón de PayPal en el contenedor
+        }).render("#paypal-button-container");  // Renderiza el botón de PayPal
     </script>
 </body>
 </html>
-
-
-@* @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-    <script>
-        
-    </script>
-}
- *@

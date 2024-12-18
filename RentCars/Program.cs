@@ -5,8 +5,12 @@ using Infrastructure.Persistence;
 using Infrastructure.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Infrastructure.Identity.Seeds;
+using OfficeOpenXml;  // Agregar la librería EPPlus para establecer el contexto de licencia.
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Establecer el contexto de licencia de EPPlus a No Comercial (LGPL)
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
